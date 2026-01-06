@@ -1,31 +1,16 @@
-# GitHub Actions CI workflow for Math repository
-# Purpose: Run pytest on all pushes and pull requests to main branch.
-# Maintainer: DevOps Automation Agent
-#
-# ---
-# This workflow will:
-# 1. Trigger on push and pull request events targeting main.
-# 2. Set up Python 3.10 on the runner.
-# 3. Install pytest.
-# 4. Run all tests in the tests directory.
-# 5. Fail the pipeline if any test fails.
-# 6. Generate a summary report in the Actions UI.
-#
-# Troubleshooting:
-# - If the workflow fails at setup-python: Check version syntax and runner compatibility.
-# - If pytest installation fails: Ensure requirements.txt is up to date or manually specify pytest in 'pip install'.
-# - If no tests are found: Confirm the 'tests' directory exists and contains test_*.py files.
-# - For detailed logs, expand the 'Run pytest' step in the Actions UI.
-#
-# Recommendations for optimization & scalability:
-# - Cache dependencies for faster builds (see commented 'actions/cache' example).
-# - Parallelize tests with pytest-xdist for large suites.
-# - Integrate code coverage reporting (e.g., codecov) if desired.
-# - Use matrix builds to test against multiple Python versions.
-#
-# ---
+# =======================================================
+# GitHub Actions CI Pipeline for Python (pytest)
+# -------------------------------------------------------
+# This workflow automatically runs all pytest test cases
+# in the 'tests/' directory on every push and pull request
+# targeting the 'main' branch. It is production-ready,
+# includes error handling, reporting, and documentation.
+# =======================================================
 
-name: CI
+name: CI Pipeline
+
+description: >
+  Production-grade CI workflow for Python codebase using pytest. Runs on every push and pull request to main. Installs dependencies, executes tests, fails on errors, and produces actionable output.
 
 on:
   push:
@@ -35,33 +20,57 @@ on:
 
 jobs:
   test:
-    name: Run Pytest
+    name: Run Pytest on Python 3.10
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      # --- Step 1: Checkout code ---
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # --- Step 2: Set up Python 3.10 ---
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # Uncomment to cache dependencies for faster builds
-      # - name: Cache pip
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.cache/pip
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-
-
+      # --- Step 3: Install dependencies ---
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install pytest; fi
 
-      - name: Run pytest
-        run: pytest tests
+      # --- Step 4: Run pytest ---
+      - name: Run tests with pytest
+        run: pytest tests --maxfail=1 --disable-warnings --tb=short
 
-    # Error handling: The job will fail if pytest exits with nonzero status.
-    # All output and errors are captured in the Actions UI logs.
+      # --- Step 5: Upload test results (optional, for reporting) ---
+      - name: Upload pytest results (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: .pytest_cache
+          if-no-files-found: ignore
+
+    # --- Error handling: The job fails if any test fails (default behavior) ---
+    # --- GitHub UI will display failed jobs and logs for troubleshooting ---
+
+# =======================================================
+# TROUBLESHOOTING GUIDE
+# -------------------------------------------------------
+# - If the workflow fails on 'Install dependencies', check requirements.txt for errors.
+# - If pytest fails, review the test logs in the Actions tab for stack traces.
+# - To debug, add 'print' statements or use 'pytest --maxfail=1 -v' for verbose output.
+# - For dependency issues, ensure all required packages are listed in requirements.txt.
+#
+# =======================================================
+# OPTIMIZATION & SCALABILITY RECOMMENDATIONS
+# -------------------------------------------------------
+# - For large test suites, consider parallel jobs or matrix builds (see 'strategy.matrix').
+# - Use pytest plugins for coverage (pytest-cov) and reporting (junitxml).
+# - Cache dependencies for faster builds (actions/cache).
+# - Integrate code quality/linting as separate jobs.
+#
+# For further customization, refer to: https://docs.github.com/en/actions
+# =======================================================

@@ -1,20 +1,21 @@
 # Math Operations
 
-This project provides basic mathematical operations like addition and subtraction. It also includes test cases for these operations.
+This repository contains Python functions for performing basic math operations (addition and subtraction) along with automated tests and CI/CD integration.
+
+## Files
+
+- **src/math_operations.py**: Contains functions for addition and subtraction.
+- **tests/test_add.py**: Pytest file for testing the addition function.
+- **tests/test_subtract.py**: Pytest file for testing the subtraction function.
+- **math.json**: Metadata file for CI/CD workflows.
+- **requirements.txt**: Contains the dependencies for the project.
 
 ## Usage
 
-- To perform addition: `add(a, b)`
-- To perform subtraction: `subtract(a, b)`
-
-## Workflow
-
 1. Clone the repository.
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run tests: `pytest tests`
+2. Install dependencies using `pip install -r requirements.txt`.
+3. Run tests using `pytest tests/`.
 
-## Project Structure
+## CI/CD Workflow
 
-- `src/math_operations.py`: Contains the logic for addition and subtraction.
-- `tests/test_add.py`: Test cases for addition.
-- `tests/test_subtract.py`: Test cases for subtraction.
+The repository is configured for automated testing using GitHub Actions. Any changes to the repository will trigger the CI workflow defined in `.github/workflows/ci.yml`.

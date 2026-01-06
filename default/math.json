@@ -1,14 +1,34 @@
 {
-  "repository": "lakshmi1212/Math",
-  "branch": "main",
-  "src_folder": "src",
-  "test_folder": "tests",
-  "files": {
-    "math_operations": "src/math_operations.py",
-    "test_add": "tests/test_add.py",
-    "test_subtract": "tests/test_subtract.py",
-    "readme": "default/README.md",
-    "requirements": "default/requirements.txt"
+  "agent_role": "ci_workflow_generator",
+  "repository": {
+    "url": "https://github.com/lakshmi1212/Math",
+    "branch": "main"
   },
-  "description": "This metadata file is used for CI/CD pipeline integration."
+  "workflow": {
+    "file_path": ".github/workflows/ci.yml",
+    "name": "CI Pipeline"
+  },
+  "triggers": {
+    "push": ["main"],
+    "pull_request": ["main"]
+  },
+  "runtime": {
+    "language": "python",
+    "version": "3.10"
+  },
+  "dependencies": [
+    "pytest"
+  ],
+  "test_execution": {
+    "test_directory": "tests",
+    "fail_on_error": true
+  },
+  "constraints": {
+    "modify_source_files": false,
+    "modify_test_files": false
+  },
+  "commit": {
+    "enabled": true,
+    "message": "Add CI workflow for Python tests"
+  }
 }

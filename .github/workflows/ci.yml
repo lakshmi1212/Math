@@ -1,35 +1,44 @@
-# =============================================================
-# CI Pipeline for lakshmi1212/Math
+# GitHub Actions CI workflow for Math repository
+# Purpose: Run pytest on all pushes and pull requests to main branch.
+# Maintainer: DevOps Automation Agent
 #
-# This workflow runs pytest on every push and pull request to main.
-# It ensures all tests in the 'tests' directory are executed on Python 3.10.
+# ---
+# This workflow will:
+# 1. Trigger on push and pull request events targeting main.
+# 2. Set up Python 3.10 on the runner.
+# 3. Install pytest.
+# 4. Run all tests in the tests directory.
+# 5. Fail the pipeline if any test fails.
+# 6. Generate a summary report in the Actions UI.
 #
-# Troubleshooting & Documentation:
-# - Test logs are available in the Actions tab for each run.
-# - If tests fail, the job will fail and a red X will be shown.
-# - Ensure all dependencies are listed in requirements.txt.
-# - For troubleshooting, review the 'Install dependencies' and 'Run tests' steps output.
+# Troubleshooting:
+# - If the workflow fails at setup-python: Check version syntax and runner compatibility.
+# - If pytest installation fails: Ensure requirements.txt is up to date or manually specify pytest in 'pip install'.
+# - If no tests are found: Confirm the 'tests' directory exists and contains test_*.py files.
+# - For detailed logs, expand the 'Run pytest' step in the Actions UI.
 #
-# Recommendations:
-# - For large projects, consider test matrix for multiple Python versions.
-# - Use pytest-cov for coverage reporting if needed.
-# - Integrate status badges in README for CI visibility.
-# =============================================================
+# Recommendations for optimization & scalability:
+# - Cache dependencies for faster builds (see commented 'actions/cache' example).
+# - Parallelize tests with pytest-xdist for large suites.
+# - Integrate code coverage reporting (e.g., codecov) if desired.
+# - Use matrix builds to test against multiple Python versions.
+#
+# ---
 
-name: CI Pipeline
+name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   pull_request:
-    branches: ["main"]
+    branches: [main]
 
 jobs:
   test:
-    name: Run Pytest on Python 3.10
+    name: Run Pytest
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python 3.10
@@ -37,14 +46,22 @@ jobs:
         with:
           python-version: '3.10'
 
+      # Uncomment to cache dependencies for faster builds
+      # - name: Cache pip
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install pytest; fi
+          pip install pytest
 
-      - name: Run tests with pytest
-        run: |
-          pytest tests/
+      - name: Run pytest
+        run: pytest tests
 
-    # Error handling is automatic: if pytest fails, the job fails.
-    # For more detailed reporting, consider using pytest plugins or uploading artifacts.
+    # Error handling: The job will fail if pytest exits with nonzero status.
+    # All output and errors are captured in the Actions UI logs.

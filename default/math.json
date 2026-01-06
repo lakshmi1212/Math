@@ -9,7 +9,7 @@
     "name": "CI Pipeline"
   },
   "triggers": {
-    "push": ["main"],
+    "push": [".github/workflows"],
     "pull_request": ["main"]
   },
   "runtime": {
